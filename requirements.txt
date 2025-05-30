@@ -1,0 +1,12 @@
+fastapi[all]
+uvicorn[standard]
+sqlmodel
+alembic
+asyncpg
+psycopg2-binary
+python-dotenv
+httpx
+python-multipart
+aiofiles
+pytest
+pydantic[all]
