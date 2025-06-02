@@ -4,7 +4,7 @@ from sqlmodel import select, update, delete
 from typing import List, Optional
 from datetime import datetime, timezone
 
-from app.db import get_session
+from app.deps import get_async_session
 from app.models.models import Servicio, Equipamiento, ServicioEquipamiento
 from app.schemas.servicios import ServicioCreate, ServicioRead, ServicioUpdate
 from app.schemas.equipamiento import EquipamientoRead
@@ -15,7 +15,7 @@ router = APIRouter(prefix="/servicios", tags=["Servicios"])
 
 @router.post("/", response_model=ServicioRead, status_code=status.HTTP_201_CREATED)
 async def create_servicio(
-    servicio: ServicioCreate, session: AsyncSession = Depends(get_session)
+    servicio: ServicioCreate, session: AsyncSession = Depends(get_async_session)
 ):
     """Crear un nuevo servicio (requiere al menos un equipamiento asignado)"""
     # Verificar que los equipamientos existen
@@ -68,7 +68,9 @@ async def create_servicio(
 
 @router.get("/", response_model=List[ServicioRead])
 async def read_all_servicios(
-    offset: int = 0, limit: int = 100, session: AsyncSession = Depends(get_session)
+    offset: int = 0,
+    limit: int = 100,
+    session: AsyncSession = Depends(get_async_session),
 ):
     """Obtener lista paginada de servicios"""
     query = select(Servicio).offset(offset).limit(limit)
@@ -78,7 +80,9 @@ async def read_all_servicios(
 
 
 @router.get("/{servicio_id}", response_model=ServicioRead)
-async def read_servicio(servicio_id: int, session: AsyncSession = Depends(get_session)):
+async def read_servicio(
+    servicio_id: int, session: AsyncSession = Depends(get_async_session)
+):
     """Obtener un servicio por su ID"""
     query = select(Servicio).where(Servicio.id == servicio_id)
     result = await session.execute(query)
@@ -95,7 +99,7 @@ async def read_servicio(servicio_id: int, session: AsyncSession = Depends(get_se
 async def update_servicio(
     servicio_id: int,
     servicio_update: ServicioUpdate,
-    session: AsyncSession = Depends(get_session),
+    session: AsyncSession = Depends(get_async_session),
 ):
     """Actualizar un servicio"""
     query = select(Servicio).where(Servicio.id == servicio_id)
@@ -153,7 +157,7 @@ async def update_servicio(
 async def partial_update_servicio(
     servicio_id: int,
     servicio_update: ServicioUpdate,
-    session: AsyncSession = Depends(get_session),
+    session: AsyncSession = Depends(get_async_session),
 ):
     """Actualizar parcialmente un servicio"""
     query = select(Servicio).where(Servicio.id == servicio_id)
@@ -209,7 +213,7 @@ async def partial_update_servicio(
 
 @router.delete("/{servicio_id}", response_model=ServicioRead)
 async def delete_servicio(
-    servicio_id: int, session: AsyncSession = Depends(get_session)
+    servicio_id: int, session: AsyncSession = Depends(get_async_session)
 ):
     """Eliminar un servicio"""
     query = select(Servicio).where(Servicio.id == servicio_id)
@@ -235,7 +239,7 @@ async def delete_servicio(
 
 @router.get("/{servicio_id}/equipamiento", response_model=List[EquipamientoRead])
 async def read_servicio_equipamiento(
-    servicio_id: int, session: AsyncSession = Depends(get_session)
+    servicio_id: int, session: AsyncSession = Depends(get_async_session)
 ):
     """Obtener equipamiento vinculado a un servicio"""
     # Verificar que el servicio existe
@@ -282,7 +286,7 @@ async def read_servicio_equipamiento(
     "/equipamiento/{equipamiento_id}/servicios", response_model=List[ServicioRead]
 )
 async def read_equipamiento_servicios(
-    equipamiento_id: int, session: AsyncSession = Depends(get_session)
+    equipamiento_id: int, session: AsyncSession = Depends(get_async_session)
 ):
     """Obtener servicios vinculados a un equipamiento"""
     # Verificar que el equipamiento existe

@@ -10,3 +10,8 @@ python-multipart
 aiofiles
 pytest
 pydantic[all]
+python-jose
+passlib[bcrypt]
+pytest-asyncio
+aiosqlite
+bcrypt

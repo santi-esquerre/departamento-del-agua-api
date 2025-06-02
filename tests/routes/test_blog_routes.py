@@ -3,7 +3,7 @@ from httpx import AsyncClient
 
 
 @pytest.mark.anyio
-async def test_crear_blogpost(client: AsyncClient):
+async def test_crear_blogpost(client: AsyncClient, auth_headers):
     blog_data = {
         "titulo": "Nuevas tecnologías en tratamiento de agua",
         "contenido": "Este es un contenido de prueba para el blog post sobre nuevas tecnologías",
@@ -11,7 +11,7 @@ async def test_crear_blogpost(client: AsyncClient):
         "tags": "Tecnología,Tratamiento,Innovación",
     }
 
-    response = await client.post("/blog/posts", json=blog_data)
+    response = await client.post("/blog/posts", json=blog_data, headers=auth_headers)
     assert response.status_code == 201
     data = response.json()
     assert data["titulo"] == blog_data["titulo"]
@@ -21,7 +21,7 @@ async def test_crear_blogpost(client: AsyncClient):
 
 
 @pytest.mark.anyio
-async def test_obtener_blogposts(client: AsyncClient):
+async def test_obtener_blogposts(client: AsyncClient, auth_headers):
     # First create a blog post to ensure there's data
     blog_data = {
         "titulo": "Conservación de acuíferos",
@@ -29,10 +29,10 @@ async def test_obtener_blogposts(client: AsyncClient):
         "autor": "Dra. Sofía López",
         "tags": "Conservación,Acuíferos",
     }
-    await client.post("/blog/posts", json=blog_data)
+    await client.post("/blog/posts", json=blog_data, headers=auth_headers)
 
     # Now get all blog posts
-    response = await client.get("/blog/posts")
+    response = await client.get("/blog/posts", headers=auth_headers)
     assert response.status_code == 200
     data = response.json()
     assert isinstance(data, list)
@@ -40,7 +40,7 @@ async def test_obtener_blogposts(client: AsyncClient):
 
 
 @pytest.mark.anyio
-async def test_obtener_blogpost_por_id(client: AsyncClient):
+async def test_obtener_blogpost_por_id(client: AsyncClient, auth_headers):
     # First create a blog post to get its ID
     blog_data = {
         "titulo": "Impacto del cambio climático en recursos hídricos",
@@ -48,12 +48,14 @@ async def test_obtener_blogpost_por_id(client: AsyncClient):
         "autor": "Dr. Fernando Ruiz",
         "tags": "Cambio Climático,Recursos Hídricos",
     }
-    create_response = await client.post("/blog/posts", json=blog_data)
+    create_response = await client.post(
+        "/blog/posts", json=blog_data, headers=auth_headers
+    )
     created_blog = create_response.json()
     blog_id = created_blog["id"]
 
     # Now get the blog post by ID
-    response = await client.get(f"/blog/posts/{blog_id}")
+    response = await client.get(f"/blog/posts/{blog_id}", headers=auth_headers)
     assert response.status_code == 200
     data = response.json()
     assert data["id"] == blog_id
@@ -61,7 +63,7 @@ async def test_obtener_blogpost_por_id(client: AsyncClient):
 
 
 @pytest.mark.anyio
-async def test_actualizar_blogpost(client: AsyncClient):
+async def test_actualizar_blogpost(client: AsyncClient, auth_headers):
     # First create a blog post to update
     blog_data = {
         "titulo": "Post para actualizar",
@@ -69,7 +71,9 @@ async def test_actualizar_blogpost(client: AsyncClient):
         "autor": "Autor Original",
         "tags": "Categoría Original",
     }
-    create_response = await client.post("/blog/posts", json=blog_data)
+    create_response = await client.post(
+        "/blog/posts", json=blog_data, headers=auth_headers
+    )
     created_blog = create_response.json()
     blog_id = created_blog["id"]
 
@@ -79,7 +83,9 @@ async def test_actualizar_blogpost(client: AsyncClient):
         "contenido": "Contenido actualizado",
         "tags": "Categoría Original,Nueva Categoría",
     }
-    response = await client.patch(f"/blog/posts/{blog_id}", json=update_data)
+    response = await client.patch(
+        f"/blog/posts/{blog_id}", json=update_data, headers=auth_headers
+    )
     assert response.status_code == 200
     data = response.json()
     assert data["id"] == blog_id
@@ -91,7 +97,7 @@ async def test_actualizar_blogpost(client: AsyncClient):
 
 
 @pytest.mark.anyio
-async def test_eliminar_blogpost(client: AsyncClient):
+async def test_eliminar_blogpost(client: AsyncClient, auth_headers):
     # First create a blog post to delete
     blog_data = {
         "titulo": "Post para eliminar",
@@ -99,21 +105,23 @@ async def test_eliminar_blogpost(client: AsyncClient):
         "autor": "Autor de Prueba",
         "tags": "Prueba,Eliminación",
     }
-    create_response = await client.post("/blog/posts", json=blog_data)
+    create_response = await client.post(
+        "/blog/posts", json=blog_data, headers=auth_headers
+    )
     created_blog = create_response.json()
     blog_id = created_blog["id"]
 
     # Now delete the blog post
-    response = await client.delete(f"/blog/posts/{blog_id}")
+    response = await client.delete(f"/blog/posts/{blog_id}", headers=auth_headers)
     assert response.status_code == 204
 
     # Verify it's deleted
-    get_response = await client.get(f"/blog/posts/{blog_id}")
+    get_response = await client.get(f"/blog/posts/{blog_id}", headers=auth_headers)
     assert get_response.status_code == 404
 
 
 @pytest.mark.anyio
-async def test_buscar_blogposts_por_categoria(client: AsyncClient):
+async def test_buscar_blogposts_por_categoria(client: AsyncClient, auth_headers):
     # First create blog posts with specific categories
     await client.post(
         "/blog/posts",
@@ -123,10 +131,13 @@ async def test_buscar_blogposts_por_categoria(client: AsyncClient):
             "autor": "Autor de Categoría",
             "tags": "Categoría Especial,Prueba",
         },
+        headers=auth_headers,
     )
 
     # Now search for posts with that category
-    response = await client.get("/blog/posts/categoria/Categoría Especial")
+    response = await client.get(
+        "/blog/posts/categoria/Categoría Especial", headers=auth_headers
+    )
     assert response.status_code == 200
     data = response.json()
     assert isinstance(data, list)
@@ -135,7 +146,7 @@ async def test_buscar_blogposts_por_categoria(client: AsyncClient):
 
 
 @pytest.mark.anyio
-async def test_buscar_blogposts_por_autor(client: AsyncClient):
+async def test_buscar_blogposts_por_autor(client: AsyncClient, auth_headers):
     # First create blog posts with specific author
     autor_especial = "Dr. Autor Especial"
     await client.post(
@@ -146,10 +157,13 @@ async def test_buscar_blogposts_por_autor(client: AsyncClient):
             "autor": autor_especial,
             "tags": "Prueba",
         },
+        headers=auth_headers,
     )
 
     # Now search for posts by that author
-    response = await client.get(f"/blog/posts/autor/{autor_especial}")
+    response = await client.get(
+        f"/blog/posts/autor/{autor_especial}", headers=auth_headers
+    )
     assert response.status_code == 200
     data = response.json()
     assert isinstance(data, list)

@@ -4,7 +4,7 @@ from sqlmodel import select, update, delete
 from typing import List, Optional
 from datetime import datetime, timezone
 
-from app.db import get_session
+from app.deps import get_async_session
 from app.models.models import Publicacion, Personal
 from app.schemas.publicaciones import (
     PublicacionCreate,
@@ -34,7 +34,7 @@ async def validate_authors(authors: List[Author], session: AsyncSession):
 
 @router.post("/", response_model=PublicacionRead, status_code=status.HTTP_201_CREATED)
 async def create_publicacion(
-    publicacion: PublicacionCreate, session: AsyncSession = Depends(get_session)
+    publicacion: PublicacionCreate, session: AsyncSession = Depends(get_async_session)
 ):
     """Crear una nueva publicación"""
     # Validar que los personal_id referenciados existen
@@ -63,7 +63,7 @@ async def read_all_publicaciones(
     anio: Optional[int] = None,
     estado: Optional[str] = None,
     autor_id: Optional[int] = None,
-    session: AsyncSession = Depends(get_session),
+    session: AsyncSession = Depends(get_async_session),
 ):
     """Obtener lista paginada de publicaciones con filtros opcionales"""
     query = select(Publicacion)
@@ -93,7 +93,7 @@ async def read_all_publicaciones(
 
 @router.get("/{publicacion_id}", response_model=PublicacionRead)
 async def read_publicacion(
-    publicacion_id: int, session: AsyncSession = Depends(get_session)
+    publicacion_id: int, session: AsyncSession = Depends(get_async_session)
 ):
     """Obtener una publicación por su ID"""
     query = select(Publicacion).where(Publicacion.id == publicacion_id)
@@ -110,7 +110,7 @@ async def read_publicacion(
 async def update_publicacion(
     publicacion_id: int,
     publicacion_update: PublicacionUpdate,
-    session: AsyncSession = Depends(get_session),
+    session: AsyncSession = Depends(get_async_session),
 ):
     """Actualizar una publicación completa"""
     query = select(Publicacion).where(Publicacion.id == publicacion_id)
@@ -143,7 +143,7 @@ async def update_publicacion(
 async def partial_update_publicacion(
     publicacion_id: int,
     publicacion_update: PublicacionUpdate,
-    session: AsyncSession = Depends(get_session),
+    session: AsyncSession = Depends(get_async_session),
 ):
     """Actualizar parcialmente una publicación"""
     query = select(Publicacion).where(Publicacion.id == publicacion_id)
@@ -174,7 +174,7 @@ async def partial_update_publicacion(
 
 @router.delete("/{publicacion_id}", response_model=PublicacionRead)
 async def delete_publicacion(
-    publicacion_id: int, session: AsyncSession = Depends(get_session)
+    publicacion_id: int, session: AsyncSession = Depends(get_async_session)
 ):
     """Eliminar una publicación"""
     query = select(Publicacion).where(Publicacion.id == publicacion_id)

@@ -6,14 +6,16 @@ from pathlib import Path
 
 
 @pytest.mark.anyio
-async def test_crear_carrera(client: AsyncClient):
+async def test_crear_carrera(client: AsyncClient, auth_headers):
     carrera_data = {
         "nombre": "Ingeniería Hidráulica",
         "descripcion": "Carrera especializada en recursos hídricos",
         "duracion_anios": 5,
     }
 
-    response = await client.post("/academico/carreras", json=carrera_data)
+    response = await client.post(
+        "/academico/carreras", json=carrera_data, headers=auth_headers
+    )
     assert response.status_code == 201
     data = response.json()
     assert data["nombre"] == carrera_data["nombre"]
@@ -22,17 +24,17 @@ async def test_crear_carrera(client: AsyncClient):
 
 
 @pytest.mark.anyio
-async def test_obtener_carreras(client: AsyncClient):
+async def test_obtener_carreras(client: AsyncClient, auth_headers):
     # First create a carrera to ensure there's data
     carrera_data = {
         "nombre": "Ingeniería del Agua",
         "descripcion": "Especializada en recursos hídricos y su gestión",
         "duracion_anios": 4,
     }
-    await client.post("/academico/carreras", json=carrera_data)
+    await client.post("/academico/carreras", json=carrera_data, headers=auth_headers)
 
     # Now get all carreras
-    response = await client.get("/academico/carreras")
+    response = await client.get("/academico/carreras", headers=auth_headers)
     assert response.status_code == 200
     data = response.json()
     assert isinstance(data, list)
@@ -40,19 +42,23 @@ async def test_obtener_carreras(client: AsyncClient):
 
 
 @pytest.mark.anyio
-async def test_obtener_carrera_por_id(client: AsyncClient):
+async def test_obtener_carrera_por_id(client: AsyncClient, auth_headers):
     # First create a carrera to get its ID
     carrera_data = {
         "nombre": "Ingeniería Ambiental",
         "descripcion": "Enfocada en soluciones ambientales",
         "duracion_anios": 5,
     }
-    create_response = await client.post("/academico/carreras", json=carrera_data)
+    create_response = await client.post(
+        "/academico/carreras", json=carrera_data, headers=auth_headers
+    )
     created_carrera = create_response.json()
     carrera_id = created_carrera["id"]
 
     # Now get the carrera by ID
-    response = await client.get(f"/academico/carreras/{carrera_id}")
+    response = await client.get(
+        f"/academico/carreras/{carrera_id}", headers=auth_headers
+    )
     assert response.status_code == 200
     data = response.json()
     assert data["id"] == carrera_id
@@ -60,20 +66,24 @@ async def test_obtener_carrera_por_id(client: AsyncClient):
 
 
 @pytest.mark.anyio
-async def test_actualizar_carrera(client: AsyncClient):
+async def test_actualizar_carrera(client: AsyncClient, auth_headers):
     # First create a carrera to update
     carrera_data = {
         "nombre": "Ingeniería Hidrológica",
         "descripcion": "Estudio de sistemas hidrológicos",
         "duracion_anios": 5,
     }
-    create_response = await client.post("/academico/carreras", json=carrera_data)
+    create_response = await client.post(
+        "/academico/carreras", json=carrera_data, headers=auth_headers
+    )
     created_carrera = create_response.json()
     carrera_id = created_carrera["id"]
 
     # Now update the carrera
     update_data = {"nombre": "Ingeniería Hidrológica Avanzada", "duracion_anios": 6}
-    response = await client.patch(f"/academico/carreras/{carrera_id}", json=update_data)
+    response = await client.patch(
+        f"/academico/carreras/{carrera_id}", json=update_data, headers=auth_headers
+    )
     assert response.status_code == 200
     data = response.json()
     assert data["id"] == carrera_id
@@ -84,35 +94,43 @@ async def test_actualizar_carrera(client: AsyncClient):
 
 
 @pytest.mark.anyio
-async def test_eliminar_carrera(client: AsyncClient):
+async def test_eliminar_carrera(client: AsyncClient, auth_headers):
     # First create a carrera to delete
     carrera_data = {
         "nombre": "Carrera para eliminar",
         "descripcion": "Esta carrera será eliminada",
         "duracion_anios": 3,
     }
-    create_response = await client.post("/academico/carreras", json=carrera_data)
+    create_response = await client.post(
+        "/academico/carreras", json=carrera_data, headers=auth_headers
+    )
     created_carrera = create_response.json()
     carrera_id = created_carrera["id"]
 
     # Now delete the carrera
-    response = await client.delete(f"/academico/carreras/{carrera_id}")
+    response = await client.delete(
+        f"/academico/carreras/{carrera_id}", headers=auth_headers
+    )
     assert response.status_code == 204
 
     # Verify it's deleted
-    get_response = await client.get(f"/academico/carreras/{carrera_id}")
+    get_response = await client.get(
+        f"/academico/carreras/{carrera_id}", headers=auth_headers
+    )
     assert get_response.status_code == 404
 
 
 @pytest.mark.anyio
-async def test_crear_materia(client: AsyncClient):
+async def test_crear_materia(client: AsyncClient, auth_headers):
     # First create a carrera for the materia
     carrera_data = {
         "nombre": "Ingeniería Civil para Materias",
         "descripcion": "Carrera para prueba de materias",
         "duracion_anios": 5,
     }
-    carrera_response = await client.post("/academico/carreras", json=carrera_data)
+    carrera_response = await client.post(
+        "/academico/carreras", json=carrera_data, headers=auth_headers
+    )
     carrera = carrera_response.json()
     carrera_id = carrera["id"]
 
@@ -126,7 +144,9 @@ async def test_crear_materia(client: AsyncClient):
         "id_carrera": carrera_id,
     }
 
-    response = await client.post("/academico/materias", json=materia_data)
+    response = await client.post(
+        "/academico/materias", json=materia_data, headers=auth_headers
+    )
     assert response.status_code == 201
     data = response.json()
     assert data["nombre"] == materia_data["nombre"]
@@ -135,7 +155,7 @@ async def test_crear_materia(client: AsyncClient):
 
 
 @pytest.mark.anyio
-async def test_subir_pdf_materia(client: AsyncClient):
+async def test_subir_pdf_materia(client: AsyncClient, auth_headers):
     # First create a carrera and materia
     carrera_response = await client.post(
         "/academico/carreras",
@@ -144,6 +164,7 @@ async def test_subir_pdf_materia(client: AsyncClient):
             "descripcion": "Carrera para prueba de PDF",
             "duracion_anios": 5,
         },
+        headers=auth_headers,
     )
     carrera = carrera_response.json()
 
@@ -157,6 +178,7 @@ async def test_subir_pdf_materia(client: AsyncClient):
             "semestre": 3,
             "id_carrera": carrera["id"],
         },
+        headers=auth_headers,
     )
     materia = materia_response.json()
     materia_id = materia["id"]
@@ -171,7 +193,9 @@ async def test_subir_pdf_materia(client: AsyncClient):
         with open(tmp_path, "rb") as pdf_file:
             files = {"file": ("test.pdf", pdf_file, "application/pdf")}
             response = await client.post(
-                f"/academico/materias/{materia_id}/upload-pdf", files=files
+                f"/academico/materias/{materia_id}/upload-pdf",
+                files=files,
+                headers=auth_headers,
             )
 
         assert response.status_code == 200
@@ -185,7 +209,7 @@ async def test_subir_pdf_materia(client: AsyncClient):
 
 
 @pytest.mark.anyio
-async def test_crear_requisito(client: AsyncClient):
+async def test_crear_requisito(client: AsyncClient, auth_headers):
     # First create a carrera and dos materias
     carrera_response = await client.post(
         "/academico/carreras",
@@ -194,6 +218,7 @@ async def test_crear_requisito(client: AsyncClient):
             "descripcion": "Carrera para prueba de requisitos",
             "duracion_anios": 5,
         },
+        headers=auth_headers,
     )
     carrera = carrera_response.json()
     carrera_id = carrera["id"]
@@ -209,6 +234,7 @@ async def test_crear_requisito(client: AsyncClient):
             "semestre": 4,
             "id_carrera": carrera_id,
         },
+        headers=auth_headers,
     )
     materia1 = materia1_response.json()
 
@@ -223,6 +249,7 @@ async def test_crear_requisito(client: AsyncClient):
             "semestre": 3,
             "id_carrera": carrera_id,
         },
+        headers=auth_headers,
     )
     materia2 = materia2_response.json()
 
@@ -233,7 +260,9 @@ async def test_crear_requisito(client: AsyncClient):
         "tipo": "prerequisito",
     }
 
-    response = await client.post("/academico/requisitos", json=requisito_data)
+    response = await client.post(
+        "/academico/requisitos", json=requisito_data, headers=auth_headers
+    )
     assert response.status_code == 201
     data = response.json()
     assert data["id_materia"] == materia1["id"]

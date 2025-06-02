@@ -1,5 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from .db import init_db
+from app.deps import get_current_admin
 
 # Importamos los routers directamente desde sus módulos
 from app.routes.archivos import router as archivos_router
@@ -10,6 +11,7 @@ from app.routes.equipamiento import router as equipamiento_router
 from app.routes.servicios import router as servicios_router
 from app.routes.academico import router as academico_router
 from app.routes.blog import router as blog_router
+from app.routes import auth
 
 # Configuración mejorada para Swagger
 app = FastAPI(
@@ -28,14 +30,15 @@ async def on_startup():
 
 
 # Incluir routers de forma explícita
-app.include_router(archivos_router)
-app.include_router(personal_router)
-app.include_router(publicaciones_router)
-app.include_router(proyectos_router)
-app.include_router(equipamiento_router)
-app.include_router(servicios_router)
-app.include_router(academico_router)
-app.include_router(blog_router)
+app.include_router(archivos_router, dependencies=[Depends(get_current_admin)])
+app.include_router(personal_router, dependencies=[Depends(get_current_admin)])
+app.include_router(publicaciones_router, dependencies=[Depends(get_current_admin)])
+app.include_router(proyectos_router, dependencies=[Depends(get_current_admin)])
+app.include_router(equipamiento_router, dependencies=[Depends(get_current_admin)])
+app.include_router(servicios_router, dependencies=[Depends(get_current_admin)])
+app.include_router(academico_router, dependencies=[Depends(get_current_admin)])
+app.include_router(blog_router, dependencies=[Depends(get_current_admin)])
+app.include_router(auth.router)
 
 
 @app.get("/")

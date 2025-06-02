@@ -17,6 +17,7 @@ from sqlalchemy.ext.asyncio import (
 from sqlmodel import SQLModel
 
 from app.db import get_session  # Corrected import for get_session
+from app.deps import get_async_session
 from app.main import app
 
 ASYNC_URL = "sqlite+aiosqlite:///:memory:"  # In-memory SQLite for tests
@@ -49,8 +50,9 @@ async def db() -> AsyncGenerator[AsyncSession, None]:  # Correct type hint
 async def client(
     db: AsyncSession,
 ) -> AsyncGenerator[AsyncClient, None]:  # Correct type hint and db type
-    # Correctly override dependencies. Assuming get_session is the primary one.
+    # Correctly override dependencies for both sync and async session
     app.dependency_overrides[get_session] = lambda: db
+    app.dependency_overrides[get_async_session] = lambda: db
 
     # Use ASGITransport for testing FastAPI apps with httpx
     async with AsyncClient(
@@ -68,3 +70,22 @@ def _init_app_db():
     import app.db
 
     asyncio.get_event_loop().run_until_complete(app.db.init_db())
+
+
+@pytest.fixture
+async def auth_headers(client, db):
+    from app.services.auth_service import create_admin
+
+    # Try to log in first
+    r = await client.post(
+        "/auth/login", json={"username": "testadmin", "password": "testpass"}
+    )
+    if r.status_code != 200:
+        # Only create if login fails
+        await create_admin(db, "testadmin", "testpass")
+        r = await client.post(
+            "/auth/login", json={"username": "testadmin", "password": "testpass"}
+        )
+        assert r.status_code == 200
+    token = r.json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}

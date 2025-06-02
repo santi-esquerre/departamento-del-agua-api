@@ -27,6 +27,8 @@ services:
       - ./uploads:/app/uploads
       - ./alembic.ini:/app/alembic.ini
       - ./requirements.txt:/app/requirements.txt
+      - ./scripts:/app/scripts
+      - ./tests:/app/tests
     ports:
       - "8000:8000"
 
