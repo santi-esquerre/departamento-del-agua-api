@@ -116,7 +116,9 @@ async def partial_update_blog_post(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@router.delete("/posts/{post_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/posts/{post_id}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[ADMIN]
+)
 async def delete_blog_post(post_id: int, db: AsyncSession = Depends(get_async_session)):
     """Eliminar un post de blog"""
     post = await svc.borrar_post(db, post_id)

@@ -218,7 +218,7 @@ async def partial_update_servicio(
     return servicio
 
 
-@router.delete("/{servicio_id}", response_model=ServicioRead)
+@router.delete("/{servicio_id}", response_model=ServicioRead, dependencies=[ADMIN])
 async def delete_servicio(
     servicio_id: int, session: AsyncSession = Depends(get_async_session)
 ):

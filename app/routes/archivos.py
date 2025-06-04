@@ -85,7 +85,7 @@ async def list_files(
     return archivos
 
 
-@router.delete("/files/{file_id}", response_model=Archivo)
+@router.delete("/files/{file_id}", response_model=Archivo, dependencies=[ADMIN])
 async def delete_file_route(file_id: int, db: AsyncSession = Depends(get_session)):
     """
     Elimina un archivo por su ID, tanto de la base de datos como del almacenamiento.

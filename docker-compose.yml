@@ -43,6 +43,7 @@ services:
       POSTGRES_HOST: db
       POSTGRES_PORT: 5432
       POSTGRES_DB: cenur_db
+      POSTGRES_DBS: cenur_db
       POSTGRES_USER: cenur
       POSTGRES_PASSWORD: cenur_pass
       POSTGRES_EXTRA_OPTS: "--schema=public --blobs"

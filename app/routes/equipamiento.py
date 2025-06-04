@@ -132,7 +132,9 @@ async def partial_update_equipamiento(
     return equipamiento
 
 
-@router.delete("/{equipamiento_id}", response_model=EquipamientoRead)
+@router.delete(
+    "/{equipamiento_id}", response_model=EquipamientoRead, dependencies=[ADMIN]
+)
 async def delete_equipamiento(
     equipamiento_id: int, session: AsyncSession = Depends(get_async_session)
 ):
