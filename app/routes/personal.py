@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 
-from app.deps import get_async_session
+from app.deps import get_async_session, get_current_admin
 from app.services import personal_service as svc
 from app.schemas.personal import (
     PersonalCreate,
@@ -15,8 +15,15 @@ from app.routes.utils import not_found
 
 router = APIRouter(prefix="/personal", tags=["Personal"])
 
+ADMIN = Depends(get_current_admin)
 
-@router.post("/", response_model=PersonalRead, status_code=status.HTTP_201_CREATED)
+
+@router.post(
+    "/",
+    response_model=PersonalRead,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[ADMIN],
+)
 async def create_personal(
     personal: PersonalCreate, db: AsyncSession = Depends(get_async_session)
 ):
@@ -48,7 +55,7 @@ async def read_personal(
     return personal
 
 
-@router.put("/{personal_id}", response_model=PersonalRead)
+@router.put("/{personal_id}", response_model=PersonalRead, dependencies=[ADMIN])
 async def update_personal(
     personal_id: int,
     personal_update: PersonalUpdate,
@@ -71,7 +78,7 @@ async def update_personal(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@router.patch("/{personal_id}", response_model=PersonalRead)
+@router.patch("/{personal_id}", response_model=PersonalRead, dependencies=[ADMIN])
 async def partial_update_personal(
     personal_id: int,
     personal_update: PersonalUpdate,
@@ -94,7 +101,7 @@ async def partial_update_personal(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@router.delete("/{personal_id}", response_model=PersonalRead)
+@router.delete("/{personal_id}", response_model=PersonalRead, dependencies=[ADMIN])
 async def delete_personal(
     personal_id: int, db: AsyncSession = Depends(get_async_session)
 ):
@@ -125,6 +132,7 @@ async def read_personal_proyectos(
     "/{personal_id}/proyectos",
     response_model=List[PersonalProyectoRead],
     status_code=status.HTTP_201_CREATED,
+    dependencies=[ADMIN],
 )
 async def create_personal_proyectos(
     personal_id: int,

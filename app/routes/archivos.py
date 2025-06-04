@@ -18,11 +18,19 @@ from app.storage import local_repo
 from app.models.models import Archivo
 from app.db import get_session
 from app.services import archivos_service
+from app.deps import get_current_admin
 
 router = APIRouter(prefix="/archivos", tags=["Archivos"])
 
+ADMIN = Depends(get_current_admin)
 
-@router.post("/upload", status_code=status.HTTP_201_CREATED, response_model=Archivo)
+
+@router.post(
+    "/upload",
+    status_code=status.HTTP_201_CREATED,
+    response_model=Archivo,
+    dependencies=[ADMIN],
+)
 async def upload_file(
     file: UploadFile = File(...), db: AsyncSession = Depends(get_session)
 ):

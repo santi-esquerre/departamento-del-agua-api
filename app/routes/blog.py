@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Optional
 from sqlmodel import select
@@ -13,19 +13,40 @@ from app.schemas.blog import (
 )
 from app.routes.utils import not_found
 from app.models.blog import BlogPost
+from app.services.email_service import send_html
+from app.services.subscriber_service import list_emails
+from fastapi import Depends
+from app.deps import get_current_admin
+
+ADMIN = Depends(get_current_admin)
 
 router = APIRouter(prefix="/blog", tags=["Blog"])
 
 
-@router.post("/posts", response_model=BlogPostRead, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/posts",
+    response_model=BlogPostRead,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[ADMIN],
+)
 async def create_blog_post(
-    post: BlogPostCreate, db: AsyncSession = Depends(get_async_session)
+    post: BlogPostCreate,
+    background: BackgroundTasks,
+    db: AsyncSession = Depends(get_async_session),
 ):
     """Crear un nuevo post en el blog"""
     try:
-        return await svc.crear_post(db, post.model_dump())
+        nuevo_post = await svc.crear_post(db, post.model_dump())
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+    # Si el post está marcado como publicado → notificar
+    if nuevo_post.publicado:
+        emails = await list_emails(db)
+        for e in emails:
+            background.add_task(send_html, e, nuevo_post.titulo, nuevo_post.contenido)
+
+    return nuevo_post
 
 
 @router.get("/posts", response_model=List[BlogPostRead])

@@ -4,7 +4,7 @@ from sqlmodel import select, update, delete
 from typing import List, Optional
 from datetime import datetime, timezone
 
-from app.deps import get_async_session
+from app.deps import get_async_session, get_current_admin
 from app.models.models import Publicacion, Personal
 from app.schemas.publicaciones import (
     PublicacionCreate,
@@ -15,6 +15,8 @@ from app.schemas.publicaciones import (
 from app.routes.utils import not_found
 
 router = APIRouter(prefix="/publicaciones", tags=["Publicaciones"])
+
+ADMIN = Depends(get_current_admin)
 
 
 async def validate_authors(authors: List[Author], session: AsyncSession):
@@ -32,7 +34,12 @@ async def validate_authors(authors: List[Author], session: AsyncSession):
                 )
 
 
-@router.post("/", response_model=PublicacionRead, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/",
+    response_model=PublicacionRead,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[ADMIN],
+)
 async def create_publicacion(
     publicacion: PublicacionCreate, session: AsyncSession = Depends(get_async_session)
 ):
@@ -106,7 +113,7 @@ async def read_publicacion(
     return publicacion
 
 
-@router.put("/{publicacion_id}", response_model=PublicacionRead)
+@router.put("/{publicacion_id}", response_model=PublicacionRead, dependencies=[ADMIN])
 async def update_publicacion(
     publicacion_id: int,
     publicacion_update: PublicacionUpdate,
@@ -139,7 +146,7 @@ async def update_publicacion(
     return publicacion
 
 
-@router.patch("/{publicacion_id}", response_model=PublicacionRead)
+@router.patch("/{publicacion_id}", response_model=PublicacionRead, dependencies=[ADMIN])
 async def partial_update_publicacion(
     publicacion_id: int,
     publicacion_update: PublicacionUpdate,
@@ -172,7 +179,9 @@ async def partial_update_publicacion(
     return publicacion
 
 
-@router.delete("/{publicacion_id}", response_model=PublicacionRead)
+@router.delete(
+    "/{publicacion_id}", response_model=PublicacionRead, dependencies=[ADMIN]
+)
 async def delete_publicacion(
     publicacion_id: int, session: AsyncSession = Depends(get_async_session)
 ):

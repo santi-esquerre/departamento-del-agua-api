@@ -29,8 +29,29 @@ services:
       - ./requirements.txt:/app/requirements.txt
       - ./scripts:/app/scripts
       - ./tests:/app/tests
+      - ./certs:/certs:ro
     ports:
-      - "8000:8000"
+      - "443:8000"
+
+  pg_backup:
+    image: prodrigestivill/postgres-backup-local:15-alpine # incluye pg_dump + cron
+    container_name: pg_backup
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: cenur_db
+      POSTGRES_USER: cenur
+      POSTGRES_PASSWORD: cenur_pass
+      POSTGRES_EXTRA_OPTS: "--schema=public --blobs"
+      SCHEDULE: "0 6 * * *" # 06:00 todos los días
+      TZ: America/Montevideo
+      # Retención opcional (7 días); ajusta si hace falta
+      BACKUP_KEEP_DAYS: "7"
+    volumes:
+      - ./backups:/backups # ← repositorio local tangible
 
 volumes:
   pgdata:

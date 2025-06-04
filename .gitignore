@@ -16,3 +16,5 @@ uploads/
 Thumbs.db
 *.log
 !.env.example
+backups/
+certs/

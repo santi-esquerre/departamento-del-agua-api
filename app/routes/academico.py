@@ -17,6 +17,10 @@ from app.schemas.academico import (
     RequisitoUpdate,
 )
 from app.routes.utils import not_found
+from fastapi import Depends
+from app.deps import get_current_admin
+
+ADMIN = Depends(get_current_admin)
 
 router = APIRouter(prefix="/academico", tags=["Académico"])
 
@@ -24,7 +28,10 @@ router = APIRouter(prefix="/academico", tags=["Académico"])
 
 
 @router.post(
-    "/carreras", response_model=CarreraRead, status_code=status.HTTP_201_CREATED
+    "/carreras",
+    response_model=CarreraRead,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[ADMIN],
 )
 async def create_carrera(
     carrera: CarreraCreate, db: AsyncSession = Depends(get_async_session)
@@ -55,7 +62,7 @@ async def read_carrera(carrera_id: int, db: AsyncSession = Depends(get_async_ses
     return carrera
 
 
-@router.put("/carreras/{carrera_id}", response_model=CarreraRead)
+@router.put("/carreras/{carrera_id}", response_model=CarreraRead, dependencies=[ADMIN])
 async def update_carrera(
     carrera_id: int,
     carrera_update: CarreraUpdate,
@@ -77,7 +84,9 @@ async def update_carrera(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@router.patch("/carreras/{carrera_id}", response_model=CarreraRead)
+@router.patch(
+    "/carreras/{carrera_id}", response_model=CarreraRead, dependencies=[ADMIN]
+)
 async def partial_update_carrera(
     carrera_id: int,
     carrera_update: CarreraUpdate,
@@ -99,7 +108,11 @@ async def partial_update_carrera(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@router.delete("/carreras/{carrera_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/carreras/{carrera_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[ADMIN],
+)
 async def delete_carrera(
     carrera_id: int, db: AsyncSession = Depends(get_async_session)
 ):
@@ -117,7 +130,10 @@ async def delete_carrera(
 
 
 @router.post(
-    "/materias", response_model=MateriaRead, status_code=status.HTTP_201_CREATED
+    "/materias",
+    response_model=MateriaRead,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[ADMIN],
 )
 async def create_materia(
     materia: MateriaCreate, db: AsyncSession = Depends(get_async_session)
@@ -151,7 +167,7 @@ async def read_materia(materia_id: int, db: AsyncSession = Depends(get_async_ses
     return materia
 
 
-@router.put("/materias/{materia_id}", response_model=MateriaRead)
+@router.put("/materias/{materia_id}", response_model=MateriaRead, dependencies=[ADMIN])
 async def update_materia(
     materia_id: int,
     materia_update: MateriaUpdate,
@@ -173,7 +189,9 @@ async def update_materia(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@router.patch("/materias/{materia_id}", response_model=MateriaRead)
+@router.patch(
+    "/materias/{materia_id}", response_model=MateriaRead, dependencies=[ADMIN]
+)
 async def partial_update_materia(
     materia_id: int,
     materia_update: MateriaUpdate,
@@ -195,7 +213,9 @@ async def partial_update_materia(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@router.delete("/materias/{materia_id}", response_model=MateriaRead)
+@router.delete(
+    "/materias/{materia_id}", response_model=MateriaRead, dependencies=[ADMIN]
+)
 async def delete_materia(
     materia_id: int, db: AsyncSession = Depends(get_async_session)
 ):
@@ -254,7 +274,10 @@ async def upload_pdf_alias(
 
 
 @router.post(
-    "/requisitos", response_model=RequisitoRead, status_code=status.HTTP_201_CREATED
+    "/requisitos",
+    response_model=RequisitoRead,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[ADMIN],
 )
 async def create_requisito(
     requisito: RequisitoCreate, db: AsyncSession = Depends(get_async_session)
@@ -287,7 +310,9 @@ async def read_requisito(
     return requisito
 
 
-@router.put("/requisitos/{requisito_id}", response_model=RequisitoRead)
+@router.put(
+    "/requisitos/{requisito_id}", response_model=RequisitoRead, dependencies=[ADMIN]
+)
 async def update_requisito(
     requisito_id: int,
     requisito_update: RequisitoUpdate,
@@ -309,7 +334,9 @@ async def update_requisito(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@router.delete("/requisitos/{requisito_id}", response_model=RequisitoRead)
+@router.delete(
+    "/requisitos/{requisito_id}", response_model=RequisitoRead, dependencies=[ADMIN]
+)
 async def delete_requisito(
     requisito_id: int, db: AsyncSession = Depends(get_async_session)
 ):

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Optional
 
-from app.deps import get_async_session
+from app.deps import get_async_session, get_current_admin
 from app.services import proyectos_service as svc
 from app.schemas.proyectos import (
     ProyectoCreate,
@@ -15,8 +15,15 @@ from app.routes.utils import not_found
 
 router = APIRouter(prefix="/proyectos", tags=["Proyectos"])
 
+ADMIN = Depends(get_current_admin)
 
-@router.post("/", response_model=ProyectoRead, status_code=status.HTTP_201_CREATED)
+
+@router.post(
+    "/",
+    response_model=ProyectoRead,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[ADMIN],
+)
 async def create_proyecto(
     proyecto: ProyectoCreate, db: AsyncSession = Depends(get_async_session)
 ):
@@ -48,7 +55,7 @@ async def read_proyecto(
     return proyecto
 
 
-@router.put("/{proyecto_id}", response_model=ProyectoRead)
+@router.put("/{proyecto_id}", response_model=ProyectoRead, dependencies=[ADMIN])
 async def update_proyecto(
     proyecto_id: int,
     proyecto_update: ProyectoUpdate,
@@ -68,7 +75,7 @@ async def update_proyecto(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@router.delete("/{proyecto_id}")
+@router.delete("/{proyecto_id}", dependencies=[ADMIN])
 async def delete_proyecto(
     proyecto_id: int, db: AsyncSession = Depends(get_async_session)
 ):

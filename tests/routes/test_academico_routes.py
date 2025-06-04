@@ -34,7 +34,7 @@ async def test_obtener_carreras(client: AsyncClient, auth_headers):
     await client.post("/academico/carreras", json=carrera_data, headers=auth_headers)
 
     # Now get all carreras
-    response = await client.get("/academico/carreras", headers=auth_headers)
+    response = await client.get("/academico/carreras")
     assert response.status_code == 200
     data = response.json()
     assert isinstance(data, list)
@@ -56,9 +56,7 @@ async def test_obtener_carrera_por_id(client: AsyncClient, auth_headers):
     carrera_id = created_carrera["id"]
 
     # Now get the carrera by ID
-    response = await client.get(
-        f"/academico/carreras/{carrera_id}", headers=auth_headers
-    )
+    response = await client.get(f"/academico/carreras/{carrera_id}")
     assert response.status_code == 200
     data = response.json()
     assert data["id"] == carrera_id
@@ -114,9 +112,7 @@ async def test_eliminar_carrera(client: AsyncClient, auth_headers):
     assert response.status_code == 204
 
     # Verify it's deleted
-    get_response = await client.get(
-        f"/academico/carreras/{carrera_id}", headers=auth_headers
-    )
+    get_response = await client.get(f"/academico/carreras/{carrera_id}")
     assert get_response.status_code == 404
 
 

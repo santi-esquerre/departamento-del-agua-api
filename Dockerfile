@@ -6,4 +6,4 @@ COPY ./app /app/app
 COPY ./alembic /app/alembic
 COPY alembic.ini .
 RUN mkdir -p /app/uploads && chmod 777 /app/uploads
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--ssl-keyfile", "/certs/key.pem", "--ssl-certfile", "/certs/cert.pem"]

@@ -27,7 +27,7 @@ async def test_create_and_get_personal(
     assert created_personal_data["email"] == personal_data.email
 
     # Get Personal by ID
-    response = await client.get(f"/personal/{personal_id}", headers=auth_headers)
+    response = await client.get(f"/personal/{personal_id}")
     assert response.status_code == 200, response.text
     retrieved_personal_data = response.json()
     assert retrieved_personal_data["id"] == personal_id
@@ -114,8 +114,8 @@ async def test_delete_personal(client: AsyncClient, db: AsyncSession, auth_heade
     assert deleted["fecha_baja"] is not None
 
     # Verify soft-deleted: GET returns the object with fecha_baja set
-    response = await client.get(f"/personal/{personal_id}", headers=auth_headers)
-    assert response.status_code == 200, response.text
+    response = await client.get(f"/personal/{personal_id}")
+    assert response.status_code == 200
     data = response.json()
     assert data["fecha_baja"] is not None
 
@@ -140,8 +140,8 @@ async def test_list_personal(client: AsyncClient, db: AsyncSession, auth_headers
         headers=auth_headers,
     )
 
-    response = await client.get("/personal/", headers=auth_headers)
-    assert response.status_code == 200, response.text
+    response = await client.get("/personal/")
+    assert response.status_code == 200
     personal_list = response.json()
     assert isinstance(personal_list, list)
     assert len(personal_list) >= 2  # Check if at least the two created are present

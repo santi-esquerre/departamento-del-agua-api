@@ -15,3 +15,5 @@ passlib[bcrypt]
 pytest-asyncio
 aiosqlite
 bcrypt
+aiosmtplib
+email-validator

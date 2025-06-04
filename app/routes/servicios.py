@@ -4,7 +4,7 @@ from sqlmodel import select, update, delete
 from typing import List, Optional
 from datetime import datetime, timezone
 
-from app.deps import get_async_session
+from app.deps import get_async_session, get_current_admin
 from app.models.models import Servicio, Equipamiento, ServicioEquipamiento
 from app.schemas.servicios import ServicioCreate, ServicioRead, ServicioUpdate
 from app.schemas.equipamiento import EquipamientoRead
@@ -12,8 +12,15 @@ from app.routes.utils import not_found
 
 router = APIRouter(prefix="/servicios", tags=["Servicios"])
 
+ADMIN = Depends(get_current_admin)
 
-@router.post("/", response_model=ServicioRead, status_code=status.HTTP_201_CREATED)
+
+@router.post(
+    "/",
+    response_model=ServicioRead,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[ADMIN],
+)
 async def create_servicio(
     servicio: ServicioCreate, session: AsyncSession = Depends(get_async_session)
 ):

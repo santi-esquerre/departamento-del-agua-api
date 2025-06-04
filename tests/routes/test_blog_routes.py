@@ -32,7 +32,7 @@ async def test_obtener_blogposts(client: AsyncClient, auth_headers):
     await client.post("/blog/posts", json=blog_data, headers=auth_headers)
 
     # Now get all blog posts
-    response = await client.get("/blog/posts", headers=auth_headers)
+    response = await client.get("/blog/posts")
     assert response.status_code == 200
     data = response.json()
     assert isinstance(data, list)
@@ -55,7 +55,7 @@ async def test_obtener_blogpost_por_id(client: AsyncClient, auth_headers):
     blog_id = created_blog["id"]
 
     # Now get the blog post by ID
-    response = await client.get(f"/blog/posts/{blog_id}", headers=auth_headers)
+    response = await client.get(f"/blog/posts/{blog_id}")
     assert response.status_code == 200
     data = response.json()
     assert data["id"] == blog_id
@@ -116,7 +116,7 @@ async def test_eliminar_blogpost(client: AsyncClient, auth_headers):
     assert response.status_code == 204
 
     # Verify it's deleted
-    get_response = await client.get(f"/blog/posts/{blog_id}", headers=auth_headers)
+    get_response = await client.get(f"/blog/posts/{blog_id}")
     assert get_response.status_code == 404
 
 

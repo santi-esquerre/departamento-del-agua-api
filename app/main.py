@@ -12,6 +12,7 @@ from app.routes.servicios import router as servicios_router
 from app.routes.academico import router as academico_router
 from app.routes.blog import router as blog_router
 from app.routes import auth
+from app.routes.subscribers import router as subscribers_router
 
 # Configuración mejorada para Swagger
 app = FastAPI(
@@ -30,14 +31,16 @@ async def on_startup():
 
 
 # Incluir routers de forma explícita
-app.include_router(archivos_router, dependencies=[Depends(get_current_admin)])
-app.include_router(personal_router, dependencies=[Depends(get_current_admin)])
-app.include_router(publicaciones_router, dependencies=[Depends(get_current_admin)])
-app.include_router(proyectos_router, dependencies=[Depends(get_current_admin)])
-app.include_router(equipamiento_router, dependencies=[Depends(get_current_admin)])
-app.include_router(servicios_router, dependencies=[Depends(get_current_admin)])
-app.include_router(academico_router, dependencies=[Depends(get_current_admin)])
-app.include_router(blog_router, dependencies=[Depends(get_current_admin)])
+app.include_router(archivos_router)
+app.include_router(personal_router)
+app.include_router(publicaciones_router)
+app.include_router(proyectos_router)
+app.include_router(equipamiento_router)
+app.include_router(servicios_router)
+app.include_router(academico_router)
+app.include_router(blog_router)
+# Suscripciones (público)
+app.include_router(subscribers_router)
 app.include_router(auth.router)
 
 

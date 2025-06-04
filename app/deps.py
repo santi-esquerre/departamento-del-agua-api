@@ -36,7 +36,7 @@ async def get_current_admin(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Token inválido"
         )
-    result = await db.execute(select(Admin).where(Admin.id == admin_id))
+    result = await db.execute(select(Admin).where(Admin.id == admin_id))  # type: ignore
     admin = result.scalar_one_or_none()
     if not admin:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)

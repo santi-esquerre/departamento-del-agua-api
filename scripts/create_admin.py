@@ -22,4 +22,4 @@ if __name__ == "__main__":
         os.environ["DATABASE_URL"] = sync_url
     SessionLocal = get_sync_session_local()
     with SessionLocal() as s:
-        create_admin(s, "admin", "admin123")
+        create_admin(s, "admin", "admin123")  # type: ignore
