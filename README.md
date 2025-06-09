@@ -1,6 +1,6 @@
 # Departamento del Agua
 
-A FastAPI + SQLModel + Alembic + PostgreSQL application for managing academic, blog, and departmental resources.
+A monorepo containing a FastAPI back-end and a React front-end. The back-end uses SQLModel and PostgreSQL to manage departmental resources while the front-end is a Vite + React application.
 
 ## Features
 
@@ -20,24 +20,15 @@ git clone <repo-url>
 cd departamento_del_agua
 ```
 
-### 2. Set up environment variables
+### 2. Start the stack with Docker
 
-Create a `.env` file in the project root with the following (example values):
-
-```
-DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/departamento_del_agua
-UPLOAD_DIR=./uploads
-SECRET_KEY=your-secret-key
-# Add other secrets as needed
-```
-
-**Note:** Never commit your `.env` or any file with secrets to version control.
-
-### 3. Install dependencies
+Run the full environment using Docker Compose:
 
 ```bash
-pip install -r requirements.txt
+docker compose up -d
 ```
+
+The back-end will be available at `http://localhost:8000` and the front-end at `https://localhost:443`.
 
 ### 4. Run Alembic migrations
 
