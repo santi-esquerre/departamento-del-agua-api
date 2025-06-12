@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from typing import List, Optional
 from enum import Enum, auto
 from sqlmodel import Field, Relationship, SQLModel
+from sqlalchemy import Column, DateTime
 
 
 class TipoRequisito(str, Enum):
@@ -17,8 +18,14 @@ class Carrera(SQLModel, table=True):
     descripcion: Optional[str] = None
     titulo_otorgado: Optional[str] = None
     duracion_anios: Optional[int] = None
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
+        sa_column=Column(DateTime(timezone=True)),
+    )
+    updated_at: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
+        sa_column=Column(DateTime(timezone=True)),
+    )
 
     # Relaciones
     materias: List["Materia"] = Relationship(back_populates="carrera")
@@ -33,8 +40,14 @@ class Materia(SQLModel, table=True):
     creditos: Optional[int] = None
     programa_pdf_url: Optional[str] = None
     id_carrera: int = Field(foreign_key="carrera.id")
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
+        sa_column=Column(DateTime(timezone=True)),
+    )
+    updated_at: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
+        sa_column=Column(DateTime(timezone=True)),
+    )
 
     # Relaciones
     carrera: Carrera = Relationship(back_populates="materias")
@@ -53,8 +66,14 @@ class Requisito(SQLModel, table=True):
     id_materia: int = Field(foreign_key="materia.id")
     id_materia_requisito: int = Field(foreign_key="materia.id")
     tipo: TipoRequisito = Field(default=TipoRequisito.PREREQUISITO)
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
+        sa_column=Column(DateTime(timezone=True)),
+    )
+    updated_at: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
+        sa_column=Column(DateTime(timezone=True)),
+    )
 
     # Relaciones
     materia: Materia = Relationship(
