@@ -10,6 +10,9 @@ FROM_EMAIL = os.getenv("FROM_EMAIL", SMTP_USER or "no-reply@example.com")
 
 
 async def send_html(to: str, subject: str, html: str):
+    if not SMTP_HOST:
+        # Skip sending email when SMTP is not configured (e.g., tests)
+        return
     msg = EmailMessage()
     msg["From"] = FROM_EMAIL
     msg["To"] = to

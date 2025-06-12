@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from typing import Optional
 from sqlmodel import SQLModel, Field, UniqueConstraint
+from sqlalchemy import Column, DateTime
 
 
 class Admin(SQLModel, table=True):
@@ -8,4 +9,7 @@ class Admin(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     username: str
     password_hash: str
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
+        sa_column=Column(DateTime(timezone=True)),
+    )
