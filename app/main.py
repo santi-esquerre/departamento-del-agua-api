@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends
 from .db import init_db
 from app.deps import get_current_admin
+from fastapi.middleware.cors import CORSMiddleware
 
 # Importamos los routers directamente desde sus módulos
 from app.routes.archivos import router as archivos_router
@@ -19,9 +20,19 @@ app = FastAPI(
     title="API Departamento del Agua",
     description="API para gestionar recursos del departamento del agua",
     version="0.1.1",
+    root_path="/api",
     openapi_url="/openapi.json",
     docs_url="/docs",
     redoc_url="/redoc",
+)
+
+# 2) (Optional in prod) CORS for other origins if needed
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://localhost"],  # your frontend origin
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 

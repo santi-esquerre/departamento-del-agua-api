@@ -30,9 +30,20 @@ services:
       - ./scripts:/app/scripts
       - ./tests:/app/tests
       - ./certs:/certs:ro
-    ports:
-      - "443:8000"
+    expose:
+      - "8000"
 
+  proxy:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+      args:
+        VITE_API_BASE_URL: "https://localhost/api"
+    depends_on: [web]
+    ports:
+      - "443:443"
+    volumes:
+      - ./certs:/etc/nginx/certs:ro
   pg_backup:
     image: prodrigestivill/postgres-backup-local:15-alpine # incluye pg_dump + cron
     container_name: pg_backup
