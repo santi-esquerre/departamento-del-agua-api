@@ -16,3 +16,8 @@ async def test_login_and_protected(client, db):
     headers = {"Authorization": f"Bearer {token}"}
     r2 = await client.get("/personal/", headers=headers)
     assert r2.status_code == 200
+
+@pytest.mark.anyio
+async def test_login_invalid_credentials(client):
+    r = await client.post("/auth/login", json={"username": "wrong", "password": "bad"})
+    assert r.status_code == 401
