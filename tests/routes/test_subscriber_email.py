@@ -25,3 +25,10 @@ async def test_subscribe_and_notify(client, db, monkeypatch, auth_headers):
 
     assert "test@example.com" in sent
     assert sent["test@example.com"][0] == "Demo"
+
+@pytest.mark.anyio
+async def test_subscriber_duplicate_email(client):
+    r1 = await client.post("/suscriptores/", json={"email": "dup@example.com"})
+    assert r1.status_code == 201
+    r2 = await client.post("/suscriptores/", json={"email": "dup@example.com"})
+    assert r2.status_code == 409

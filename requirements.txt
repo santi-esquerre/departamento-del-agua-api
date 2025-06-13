@@ -1,4 +1,4 @@
-fastapi[all]
+fastapi[all]>=0.115
 uvicorn[standard]
 sqlmodel
 alembic
@@ -9,7 +9,7 @@ httpx
 python-multipart
 aiofiles
 pytest
-pydantic[all]
+pydantic[all]>=2
 python-jose
 passlib[bcrypt]
 pytest-asyncio
