@@ -1,6 +1,7 @@
 // frontend/src/pages/identidad/index.tsx
 import { useEffect, useState } from 'react';
 import { fetchPersonales, createPersonal } from '@/lib/personal';
+import { uploadFile } from '@/lib/files';
 import { useAuthStore } from '@/store/auth';
 import { useRouter } from '@/routes/hooks';
 import { Button } from '@/components/ui/button';
@@ -22,6 +23,14 @@ export default function IdentidadPage() {
   const [list, setList] = useState<Personal[]>([]);
   const [nuevo, setNuevo] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Para foto
+  const [fotoFile, setFotoFile] = useState<File | null>(null);
+
+  // Para CV: opción, enlace y archivo
+  const [cvOption, setCvOption] = useState<'link' | 'upload'>('link');
+  const [cvLink, setCvLink] = useState('');
+  const [cvFile, setCvFile] = useState<File | null>(null);
 
   const [form, setForm] = useState<Omit<Personal, 'id'>>({
     nombre: '',
@@ -51,13 +60,38 @@ export default function IdentidadPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const created = await createPersonal(form);
-      setList([...list, created]);
+      // 1) Subir FOTO si hay
+      let fotoUrl = '';
+      if (fotoFile) {
+        const { ruta } = await uploadFile(fotoFile);
+        fotoUrl = ruta;
+      }
+
+      // 2) Determinar URL de CV
+      let cvUrl = '';
+      if (cvOption === 'link') {
+        cvUrl = cvLink.trim();
+      } else if (cvOption === 'upload' && cvFile) {
+        const { ruta } = await uploadFile(cvFile);
+        cvUrl = ruta;
+      }
+
+      // 3) Crear Personal con todos los campos
+      const nuevoPersonal = await createPersonal({
+        ...form, // nombre, cargo, descripción, email, fecha_alta, etc.
+        foto_url: fotoUrl,
+        cv_url: cvUrl
+      });
+
+      // console.log('Nuevo personal creado:', nuevoPersonal);
+
+      // 4) Continuar flujo
+      setList([...list, nuevoPersonal]);
+      setPersonal(nuevoPersonal);
       toast({ title: 'Identidad creada' });
-      setPersonal(created);
       router.replace('/dashboard');
     } catch {
-      toast({ variant: 'destructive', title: 'No se pudo crear' });
+      toast({ variant: 'destructive', title: 'Error al crear identidad' });
     } finally {
       setLoading(false);
     }
@@ -135,16 +169,81 @@ export default function IdentidadPage() {
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
           />
-          <Input
-            placeholder="URL de foto"
-            value={form.foto_url}
-            onChange={(e) => setForm({ ...form, foto_url: e.target.value })}
-          />
-          <Input
-            placeholder="URL de CV"
-            value={form.cv_url}
-            onChange={(e) => setForm({ ...form, cv_url: e.target.value })}
-          />
+
+          {/* --- Campo FOTO --- */}
+          <label className="block">
+            <span className="text-sm font-medium">Foto (JPG, PNG)</span>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setFotoFile(e.target.files?.[0] ?? null)}
+              className="mt-1 block w-full"
+            />
+            {fotoFile && (
+              <img
+                src={URL.createObjectURL(fotoFile)}
+                alt="Preview"
+                className="mt-2 h-16 w-16 rounded-full object-cover"
+              />
+            )}
+          </label>
+
+          {/* --- Selector opción CV --- */}
+          <div className="mt-4">
+            <span className="mb-2 block font-medium">CV</span>
+            <div className="mb-2 flex items-center gap-6">
+              <label className="inline-flex items-center">
+                <input
+                  type="radio"
+                  name="cvOption"
+                  value="link"
+                  checked={cvOption === 'link'}
+                  onChange={() => setCvOption('link')}
+                  className="mr-2"
+                />
+                Enlace
+              </label>
+              <label className="inline-flex items-center">
+                <input
+                  type="radio"
+                  name="cvOption"
+                  value="upload"
+                  checked={cvOption === 'upload'}
+                  onChange={() => setCvOption('upload')}
+                  className="mr-2"
+                />
+                Subir PDF
+              </label>
+            </div>
+
+            {/* Campo ENLACE */}
+            {cvOption === 'link' && (
+              <input
+                type="url"
+                placeholder="https://ejemplo.com/mi-cv.pdf"
+                value={cvLink}
+                onChange={(e) => setCvLink(e.target.value)}
+                className="block w-full rounded-md border px-3 py-2 text-muted-foreground"
+              />
+            )}
+
+            {/* Campo SUBIDA */}
+            {cvOption === 'upload' && (
+              <>
+                <input
+                  type="file"
+                  accept="application/pdf"
+                  onChange={(e) => setCvFile(e.target.files?.[0] ?? null)}
+                  className="block w-full rounded-md border px-3 py-2"
+                />
+                {cvFile && (
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Seleccionado: {cvFile.name}
+                  </p>
+                )}
+              </>
+            )}
+          </div>
           <Input
             placeholder="ORCID"
             value={form.orcid}

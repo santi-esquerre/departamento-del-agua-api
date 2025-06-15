@@ -48,6 +48,7 @@ async def upload_file(
     try:
         # Guardar el archivo físicamente y crear registro en la base de datos
         archivo_db = await archivos_service.guardar_archivo(db=db, file=file)
+        archivo_db.ruta = "/api/archivos/download/" + str(archivo_db.id)
         return archivo_db
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))

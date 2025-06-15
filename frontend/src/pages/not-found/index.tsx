@@ -9,19 +9,14 @@ export default function NotFound() {
       <span className="bg-gradient-to-b from-foreground to-transparent bg-clip-text text-[10rem] font-extrabold leading-none text-transparent">
         404
       </span>
-      <h2 className="font-heading my-2 text-2xl font-bold">
-        Something&apos;s missing
-      </h2>
-      <p>
-        Sorry, the page you are looking for doesn&apos;t exist or has been
-        moved.
-      </p>
+      <h2 className="font-heading my-2 text-2xl font-bold">Algo acá falta</h2>
+      <p>Lo sentimos, la página que buscas no existe o ha sido movida.</p>
       <div className="mt-8 flex justify-center gap-2">
         <Button onClick={() => router.back()} variant="default" size="lg">
-          Go back
+          Ir atrás
         </Button>
         <Button onClick={() => router.push('/')} variant="ghost" size="lg">
-          Back to Home
+          Volver al inicio
         </Button>
       </div>
     </div>

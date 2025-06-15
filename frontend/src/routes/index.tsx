@@ -44,6 +44,7 @@ export default function AppRouter() {
     { path: '/login', element: <SignInPage /> },
     { path: '/identidad', element: <IdentidadPage /> },
     { path: '/404', element: <NotFound /> },
+    { path: '/dashboard', element: <Navigate to="/" replace /> },
     { path: '*', element: <Navigate to="/404" replace /> }
   ];
 
