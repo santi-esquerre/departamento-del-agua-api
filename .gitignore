@@ -18,7 +18,7 @@ Thumbs.db
 !.env.example
 backups/
 certs/
-codebase.md
+*/codebase.md
 frontend/logs
 frontend/*.log
 frontend/npm-debug.log*

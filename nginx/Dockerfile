@@ -6,6 +6,7 @@ RUN npm ci
 COPY frontend .
 ARG VITE_API_BASE_URL
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
+ENV NODE_ENV=production
 RUN npm run build             # genera /app/dist
 
 # --- 2) Nginx sirve estáticos + proxys API ---

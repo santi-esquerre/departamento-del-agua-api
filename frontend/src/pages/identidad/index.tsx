@@ -122,7 +122,7 @@ export default function IdentidadPage() {
             <CardFooter className="flex items-center justify-between">
               {p.foto_url && (
                 <img
-                  src={p.foto_url}
+                  src={`${import.meta.env.VITE_API_BASE_URL}${p.foto_url.slice(4)}`}
                   alt={p.nombre}
                   className="h-10 w-10 rounded-full object-cover"
                 />

@@ -29,7 +29,10 @@ app = FastAPI(
 # 2) (Optional in prod) CORS for other origins if needed
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://localhost"],  # your frontend origin
+    allow_origins=[
+        "https://localhost/*",
+        "https://localhost:5173",
+    ],  # your frontend origin
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -58,3 +61,8 @@ app.include_router(auth.router)
 @app.get("/")
 def root():
     return {"status": "ok"}
+
+
+@app.get("/docs.json", include_in_schema=False)
+def get_openapi_json():
+    return app.openapi()

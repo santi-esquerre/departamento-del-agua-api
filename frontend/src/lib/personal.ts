@@ -11,3 +11,15 @@ export async function createPersonal(data: Omit<Personal, 'id'>): Promise<Person
   const res = await api.post<Personal>('/personal', data)
   return res.data
 }
+
+// actualizar personal
+export async function updatePersonal(id: number, data: Partial<Personal>) {
+  const res = await api.put<Personal>(`/personal/${id}`, data)
+  return res.data
+}
+
+// borrar personal
+export async function deletePersonal(id: number) {
+  await api.delete(`/personal/${id}`)
+}
+

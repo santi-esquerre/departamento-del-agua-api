@@ -3,7 +3,7 @@ import axios from 'axios'
 import { getToken, clearToken } from '@/store/auth'
 
 const api = axios.create({
-  baseURL: "https://localhost/api", // Cambia esto por tu URL base
+  baseURL: "https://localhost:443/api", // Cambia esto por tu URL base
   withCredentials: true,
 })
 
